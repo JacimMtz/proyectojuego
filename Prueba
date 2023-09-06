@@ -1,0 +1,106 @@
+import pygame
+import sys
+import random
+
+# Constantes
+WIDTH, HEIGHT = 800, 600
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+PLAYER_COLOR = (0, 255, 0)
+ENEMY_COLOR = (255, 0, 0)
+BULLET_COLOR = (0, 0, 255)
+
+PLAYER_WIDTH, PLAYER_HEIGHT = 50, 50
+ENEMY_WIDTH, ENEMY_HEIGHT = 50, 50
+BULLET_WIDTH, BULLET_HEIGHT = 10, 30
+
+PLAYER_SPEED = 5
+ENEMY_SPEED = 2
+BULLET_SPEED = 5
+
+ENEMY_ROWS = 3
+ENEMY_COLS = 10
+
+# Inicialización de Pygame
+pygame.init()
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Space Invaders")
+clock = pygame.time.Clock()
+
+# Función para mostrar el menú de inicio
+def show_menu():
+    menu_font = pygame.font.Font(None, 48)
+    title_text = menu_font.render("Space Invaders", True, WHITE)
+    play_text = menu_font.render("Jugar", True, WHITE)
+    quit_text = menu_font.render("Salir", True, WHITE)
+
+    title_rect = title_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
+    play_rect = play_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
+    quit_rect = quit_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 100))
+
+    screen.blit(title_text, title_rect)
+    screen.blit(play_text, play_rect)
+    screen.blit(quit_text, quit_rect)
+    pygame.display.flip()
+
+# Variables de juego
+player_rect = pygame.Rect(WIDTH // 2 - PLAYER_WIDTH // 2, HEIGHT - PLAYER_HEIGHT - 10, PLAYER_WIDTH, PLAYER_HEIGHT)
+bullets = []
+enemies = []
+
+# Crear enemigos
+for row in range(ENEMY_ROWS):
+    for col in range(ENEMY_COLS):
+        enemy_rect = pygame.Rect(
+            col * (ENEMY_WIDTH + 10) + 50,
+            row * (ENEMY_HEIGHT + 10) + 50,
+            ENEMY_WIDTH,
+            ENEMY_HEIGHT
+        )
+        enemies.append(enemy_rect)
+
+score = 0
+font = pygame.font.Font(None, 36)
+
+game_over = False
+game_state = "menu"  # Comienza en el estado del menú
+
+# Bucle del juego
+while game_state != "quit":
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            game_state = "quit"
+
+    # Manejar eventos del menú
+    if game_state == "menu":
+        show_menu()
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    if play_rect.collidepoint(pygame.mouse.get_pos()):
+                        game_state = "playing"
+                        # Reiniciar juego
+                        player_rect = pygame.Rect(WIDTH // 2 - PLAYER_WIDTH // 2, HEIGHT - PLAYER_HEIGHT - 10, PLAYER_WIDTH, PLAYER_HEIGHT)
+                        bullets = []
+                        enemies = []
+                        for row in range(ENEMY_ROWS):
+                            for col in range(ENEMY_COLS):
+                                enemy_rect = pygame.Rect(
+                                    col * (ENEMY_WIDTH + 10) + 50,
+                                    row * (ENEMY_HEIGHT + 10) + 50,
+                                    ENEMY_WIDTH,
+                                    ENEMY_HEIGHT
+                                )
+                                enemies.append(enemy_rect)
+                        score = 0
+                    elif quit_rect.collidepoint(pygame.mouse.get_pos()):
+                        game_state = "quit"
+
+    # El resto del código del juego permanece igual...
+
+# Pantalla de fin de juego
+if game_state == "quit":
+    pygame.quit()
+    sys.exit()
+
+pygame.time.delay(2000)
